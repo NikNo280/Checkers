@@ -14,10 +14,6 @@ public class FirebaseDatabaseModel {
         database = FirebaseDatabase.getInstance();
     }
 
-    public String push(String path) {
-        return database.getReference(path).push().getKey();
-    }
-
     public void updateChild(String path, Map<String, Object> values) {
         database.getReference(path).updateChildren(values);
     }

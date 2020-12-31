@@ -24,6 +24,7 @@ public class MainMenu extends AppCompatActivity {
         mainMenuViewModel = ViewModelProviders.of(this).get(MainMenuViewModel.class);
         mainMenuViewModel.getIsConnect().observe(this, v -> {
             Intent intent = new Intent(MainMenu.this, PlayRoom.class);
+            intent.putExtra("RoomName", mainMenuViewModel.getRoomNameLiveData().getValue());
             startActivity(intent);
         });
     }
@@ -35,8 +36,6 @@ public class MainMenu extends AppCompatActivity {
 
     public void bntCreate(View view) {
         mainMenuViewModel.createRoom(textView.getText().toString());
-        Intent intent = new Intent(MainMenu.this, PlayRoom.class);
-        startActivity(intent);
     }
 
     public void bntConnect(View view) {
