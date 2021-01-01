@@ -25,6 +25,7 @@ public class MainMenu extends AppCompatActivity {
         mainMenuViewModel.getIsConnect().observe(this, v -> {
             Intent intent = new Intent(MainMenu.this, PlayRoom.class);
             intent.putExtra("RoomName", mainMenuViewModel.getRoomNameLiveData().getValue());
+            intent.putExtra("RoomRole", mainMenuViewModel.getRoomRole().getValue());
             startActivity(intent);
         });
     }

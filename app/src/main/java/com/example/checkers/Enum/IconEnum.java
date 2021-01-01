@@ -24,4 +24,23 @@ public enum IconEnum {
     public int getImageCode() {
         return imageCode;
     }
+    public static int getImageCode(int mapCode){
+        switch (mapCode)
+        {
+            case 0:
+                return IconEnum.WHITE_MAP.getImageCode();
+            case 1:
+                return IconEnum.BLACK_MAP.getImageCode();
+            case 2:
+                return IconEnum.WHITE_CHECKER.getImageCode();
+            case 3:
+                return IconEnum.BLACK_CHECKER.getImageCode();
+            case 4:
+                return IconEnum.WHITE_QUEEN.getImageCode();
+            case 5:
+                return IconEnum.BLACK_QUEEN.getImageCode();
+            default:
+                return -13;
+        }
+    }
 }

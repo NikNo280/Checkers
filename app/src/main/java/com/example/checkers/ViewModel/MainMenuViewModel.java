@@ -8,7 +8,6 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import com.example.checkers.Enum.IconEnum;
 import com.example.checkers.Model.FirebaseAuthenticationModel;
 import com.example.checkers.Model.FirebaseDatabaseModel;
 import com.google.firebase.database.DataSnapshot;
@@ -21,11 +20,11 @@ import java.util.Map;
 public class MainMenuViewModel extends AndroidViewModel {
     private final MutableLiveData<Boolean> isConnect = new MutableLiveData<>();
     private final MutableLiveData<String> roomNameLiveData = new MutableLiveData<>();
+    private final MutableLiveData<String> roomRole = new MutableLiveData<>();
     private final String pathRooms = "Rooms";
     private final String pathUser = "user";
     private final String pathChecker = "checker";
     private final String pathRole = "role";
-    private final String pathMap = "map";
 
     FirebaseAuthenticationModel firebaseAuth;
     FirebaseDatabaseModel firebaseDatabase;
@@ -50,48 +49,10 @@ public class MainMenuViewModel extends AndroidViewModel {
         }
         roomNameLiveData.setValue(roomName);
         Map<String, Object> values = new HashMap<>();
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-                if (i < 3)
-                {
-                    if(i % 2 == j % 2)
-                    {
-                        values.put(String.valueOf(i * 8 + j), IconEnum.WHITE_MAP.getMapCode());
-                    }
-                    else
-                    {
-                        values.put(String.valueOf(i * 8 + j), IconEnum.BLACK_CHECKER.getMapCode());
-                    }
-                }
-                else if (i < 5)
-                {
-                    if(i % 2 == j % 2)
-                    {
-                        values.put(String.valueOf(i * 8 + j), IconEnum.WHITE_MAP.getMapCode());;
-                    }
-                    else
-                    {
-                        values.put(String.valueOf(i * 8 + j), IconEnum.BLACK_MAP.getMapCode());
-                    }
-                }
-                else
-                {
-                    if(i % 2 == j % 2)
-                    {
-                        values.put(String.valueOf(i * 8 + j), IconEnum.WHITE_MAP.getMapCode());
-                    }
-                    else
-                    {
-                        values.put(String.valueOf(i * 8 + j), IconEnum.WHITE_CHECKER.getMapCode());
-                    }
-                }
-            }
-        }
-        firebaseDatabase.updateChild("/"+ pathRooms + "/" + roomName + "/" + pathMap, values);
-        values = new HashMap<>();
         values.put(pathUser, firebaseAuth.getUserUID());
         values.put(pathChecker, 12);
         values.put(pathRole, "host");
+        roomRole.setValue("host");
         firebaseDatabase.updateChild("/"+ pathRooms + "/" + roomName + "/p1", values);
         isConnect.setValue(true);
     }
@@ -109,6 +70,8 @@ public class MainMenuViewModel extends AndroidViewModel {
                     values.put(pathUser, firebaseAuth.getUserUID());
                     values.put(pathChecker, 12);
                     values.put(pathRole, "visitor");
+                    roomRole.setValue("visitor");
+                    roomNameLiveData.setValue(roomName);
                     firebaseDatabase.updateChild("/"+ pathRooms + "/" + roomName + "/p2", values);
                     isConnect.setValue(true);
                 } else {
@@ -125,5 +88,9 @@ public class MainMenuViewModel extends AndroidViewModel {
     //TODO
     public void removeRoom() {
         firebaseDatabase.remove(pathRooms + "/" + roomNameLiveData.getValue());
+    }
+
+    public MutableLiveData<String> getRoomRole() {
+        return roomRole;
     }
 }

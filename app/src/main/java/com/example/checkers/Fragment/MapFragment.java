@@ -1,6 +1,8 @@
 package com.example.checkers.Fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,8 +13,10 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.checkers.Adapter.MapAdapter;
+import com.example.checkers.Interfase.IMap;
 import com.example.checkers.R;
-import com.example.checkers.ViewModel.PlayRoomViewModel;
+import com.example.checkers.ViewModel.HostViewModel;
+import com.example.checkers.ViewModel.VisitorViewModel;
 
 import java.util.Objects;
 
@@ -21,14 +25,20 @@ public class MapFragment extends Fragment implements MapAdapter.ItemListener{
     protected String[] nameList = new String[64];
     RecyclerView recyclerView;
     GridLayoutManager gridLayoutManager;
-    PlayRoomViewModel playRoomViewModel;
+    IMap playRoomViewModel;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        playRoomViewModel = ViewModelProviders.of(Objects.requireNonNull(getActivity())).get(PlayRoomViewModel.class);
-        playRoomViewModel.getMap().observe(Objects.requireNonNull(requireActivity()), s -> {
-            MapAdapter mapAdapter = new MapAdapter(s, nameList, this);
+        Intent intent = Objects.requireNonNull(getActivity()).getIntent();
+        if (intent.getStringExtra("RoomRole").equals("host")) {
+            playRoomViewModel = ViewModelProviders.of(Objects.requireNonNull(getActivity())).get(HostViewModel.class);
+        } else {
+            playRoomViewModel = ViewModelProviders.of(Objects.requireNonNull(getActivity())).get(VisitorViewModel.class);
+        }
+        playRoomViewModel.initialization(intent.getStringExtra("RoomName"));
+        playRoomViewModel.getMap().observe(Objects.requireNonNull(requireActivity()), v -> {
+            MapAdapter mapAdapter = new MapAdapter(v, nameList, this);
             recyclerView.setAdapter(mapAdapter);
         });
     }
@@ -41,11 +51,10 @@ public class MapFragment extends Fragment implements MapAdapter.ItemListener{
         recyclerView = view.findViewById(R.id.recyclerView);
         gridLayoutManager = new GridLayoutManager(getContext(), 8);
         recyclerView.setLayoutManager(gridLayoutManager);
-        for (int i = 0; i < 8; i++)
-            for (int j = 0; j < 8; j++) {
-                nameList[i * 8 + j] = String.valueOf((i * 8) + j);
-            }
-
+        for (int i = 0; i < 64; i++)
+        {
+            nameList[i] = String.valueOf(i);
+        }
         return view;
     }
 

@@ -2,30 +2,45 @@ package com.example.checkers.Activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.EditText;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProviders;
 
+import com.example.checkers.Interfase.IMap;
 import com.example.checkers.R;
-import com.example.checkers.ViewModel.PlayRoomViewModel;
+import com.example.checkers.ViewModel.HostViewModel;
+import com.example.checkers.ViewModel.VisitorViewModel;
+
+import java.util.Objects;
 
 public class PlayRoom extends AppCompatActivity {
 
-    PlayRoomViewModel playRoomViewModel;
-    EditText stepET;
+    IMap playRoomViewModel;
+    EditText stepET, tempET;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_play_room);
 
-        Intent intent = getIntent();
         stepET = findViewById(R.id.stepET);
-        playRoomViewModel = ViewModelProviders.of(this).get(PlayRoomViewModel.class);
-        playRoomViewModel.setRoomNameLiveData(intent.getStringExtra("RoomName"));
-        playRoomViewModel.getStep().observe(this, v -> {
+        //TODO
+        tempET = findViewById(R.id.tempET);
+        Intent intent = Objects.requireNonNull(this).getIntent();
+        if (intent.getStringExtra("RoomRole").equals("host")) {
+            playRoomViewModel = ViewModelProviders.of(Objects.requireNonNull(this)).get(HostViewModel.class);
+        } else {
+            playRoomViewModel = ViewModelProviders.of(Objects.requireNonNull(this)).get(VisitorViewModel.class);
+        }
+        playRoomViewModel.initialization(intent.getStringExtra("RoomName"));
+        //TODO
+        playRoomViewModel.getStepET().observe(this, v -> {
             stepET.setText(v);
         });
+    }
+
+    public void btnNext(View view) {
     }
 }
