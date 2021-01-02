@@ -8,8 +8,6 @@ public interface IMap {
     void initialization(String roomName);
     LiveData<String> getStepET();
     void endStepInBtn();
-    //TODO
-    void SetZero();
     LiveData<Integer> getCountChecker();
     void addStatistics();
 

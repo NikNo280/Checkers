@@ -432,12 +432,6 @@ public class HostViewModel extends AndroidViewModel implements IMap {
             firebaseDatabase.updateChild(pathRooms + "/" + roomName, values);
         }
     }
-    //TODO
-    public void SetZero()
-    {
-        countChecker.setValue(12);
-    }
-
     public LiveData<Integer> getCountChecker() {
         return countChecker;
     }

@@ -48,8 +48,4 @@ public class PlayRoom extends AppCompatActivity {
     public void btnNext(View view) {
         playRoomViewModel.endStepInBtn();
     }
-
-    public void btnEnd(View view) {
-        playRoomViewModel.SetZero();
-    }
 }

@@ -393,12 +393,6 @@ public class VisitorViewModel extends AndroidViewModel implements IMap {
         positionToMove.setValue("-1");
     }
 
-    //TODO
-    public void SetZero()
-    {
-        countChecker.setValue(12);
-    }
-
     public LiveData<Integer> getCountChecker() {
         return countChecker;
     }
