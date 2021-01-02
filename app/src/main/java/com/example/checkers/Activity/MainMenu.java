@@ -42,4 +42,9 @@ public class MainMenu extends AppCompatActivity {
     public void bntConnect(View view) {
         mainMenuViewModel.connectToRoom(textView.getText().toString());
     }
+
+    public void bntStatistics(View view) {
+        Intent intent = new Intent(MainMenu.this, Statistics.class);
+        startActivity(intent);
+    }
 }

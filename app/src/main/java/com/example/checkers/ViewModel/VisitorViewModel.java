@@ -392,4 +392,58 @@ public class VisitorViewModel extends AndroidViewModel implements IMap {
         positionChecker.setValue("-1");
         positionToMove.setValue("-1");
     }
+
+    //TODO
+    public void SetZero()
+    {
+        countChecker.setValue(12);
+    }
+
+    public LiveData<Integer> getCountChecker() {
+        return countChecker;
+    }
+
+    public void addStatistics() {
+        Map<String, Object> values = new HashMap<>();
+        firebaseDatabase.getReference(pathRooms + "/" + roomName + "/p1").
+                addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        if (firebaseAuth.getUserUID().equals(dataSnapshot.child("user").getValue(String.class)))
+                        {
+                            values.put("Результат", "Победа");
+                        }
+                        else
+                        {
+                            values.put("Результат", "Поражение");
+                        }
+                        firebaseDatabase.updateChild("Statistics/" + dataSnapshot.child("user").getValue(String.class) + "/" + roomName, values);
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+        firebaseDatabase.getReference(pathRooms + "/" + roomName + "/p2").
+                addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        if (firebaseAuth.getUserUID().equals(dataSnapshot.child("user").getValue(String.class)))
+                        {
+                            values.put("Результат", "Победа");
+                        }
+                        else
+                        {
+                            values.put("Результат", "Поражение");
+                        }
+                        firebaseDatabase.updateChild("Statistics/" + dataSnapshot.child("user").getValue(String.class) + "/" + roomName, values);
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+    }
 }

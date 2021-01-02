@@ -18,7 +18,7 @@ import java.util.Objects;
 public class PlayRoom extends AppCompatActivity {
 
     IMap playRoomViewModel;
-    EditText stepET, tempET;
+    EditText stepET;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,8 +26,6 @@ public class PlayRoom extends AppCompatActivity {
         setContentView(R.layout.activity_play_room);
 
         stepET = findViewById(R.id.stepET);
-        //TODO
-        tempET = findViewById(R.id.tempET);
         Intent intent = Objects.requireNonNull(this).getIntent();
         if (intent.getStringExtra("RoomRole").equals("host")) {
             playRoomViewModel = ViewModelProviders.of(Objects.requireNonNull(this)).get(HostViewModel.class);
@@ -35,13 +33,23 @@ public class PlayRoom extends AppCompatActivity {
             playRoomViewModel = ViewModelProviders.of(Objects.requireNonNull(this)).get(VisitorViewModel.class);
         }
         playRoomViewModel.initialization(intent.getStringExtra("RoomName"));
-        //TODO
         playRoomViewModel.getStepET().observe(this, v -> {
             stepET.setText(v);
+        });
+        playRoomViewModel.getCountChecker().observe(this, v -> {
+            if (v  == 12)
+            {
+                playRoomViewModel.addStatistics();
+                finish();
+            }
         });
     }
 
     public void btnNext(View view) {
         playRoomViewModel.endStepInBtn();
+    }
+
+    public void btnEnd(View view) {
+        playRoomViewModel.SetZero();
     }
 }

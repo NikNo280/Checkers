@@ -11,19 +11,21 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="116dp"
-        android:text="Profile"
         android:onClick="bntProfile"
+        android:text="Profile"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnStatistics"
+        app:layout_constraintVertical_bias="0.884" />
 
     <Button
         android:id="@+id/btnCreateRoom"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="84dp"
-        android:text="Create Room"
         android:onClick="bntCreate"
+        android:text="Create Room"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/roomNameET" />
@@ -34,8 +36,8 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="72dp"
         android:ems="10"
-        android:inputType="textPersonName"
         android:hint="Room Name"
+        android:inputType="textPersonName"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -45,9 +47,21 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="72dp"
-        android:text="Connect to room"
         android:onClick="bntConnect"
+        android:text="Connect to room"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btnCreateRoom" />
+
+    <Button
+        android:id="@+id/btnStatistics"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="72dp"
+        android:text="Statistics"
+        android:onClick="bntStatistics"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnConnect" />
 </androidx.constraintlayout.widget.ConstraintLayout>
