@@ -42,6 +42,6 @@ public class PlayRoom extends AppCompatActivity {
     }
 
     public void btnNext(View view) {
-        playRoomViewModel.endStep();
+        playRoomViewModel.endStepInBtn();
     }
 }

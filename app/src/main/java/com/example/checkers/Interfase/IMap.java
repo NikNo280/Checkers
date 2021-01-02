@@ -7,5 +7,5 @@ public interface IMap {
     void setPoint(String index);
     void initialization(String roomName);
     LiveData<String> getStepET();
-    void endStep();
+    void endStepInBtn();
 }

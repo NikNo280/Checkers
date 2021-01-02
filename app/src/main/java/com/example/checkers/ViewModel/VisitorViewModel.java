@@ -1,7 +1,6 @@
 package com.example.checkers.ViewModel;
 
 import android.app.Application;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -41,9 +40,8 @@ public class VisitorViewModel extends AndroidViewModel implements IMap {
         super(application);
         firebaseAuth = new FirebaseAuthenticationModel();
         firebaseDatabase = new FirebaseDatabaseModel();
-        isChecker.setValue(false);
-        isStep.setValue(false);
-        countChecker.setValue(12);
+        endStep();
+        countChecker.setValue(0);
     }
 
     public void initialization(String roomName)
@@ -133,6 +131,13 @@ public class VisitorViewModel extends AndroidViewModel implements IMap {
                             isQueen.setValue(false);
                             return;
                         }
+                        else if (Integer.parseInt(Objects.requireNonNull(dataSnapshot.getValue()).toString()) == IconEnum.BLACK_QUEEN.getMapCode())
+                        {
+                            positionChecker.setValue(index);
+                            isCheckerSelected.setValue(true);
+                            isQueen.setValue(true);
+                            return;
+                        }
                         else if (isCheckerSelected.getValue())
                         {
                             if (Integer.parseInt(Objects.requireNonNull(dataSnapshot.getValue()).toString()) == IconEnum.BLACK_MAP.getMapCode())
@@ -156,52 +161,19 @@ public class VisitorViewModel extends AndroidViewModel implements IMap {
         updateMap();
     }
 
-    private void updatePositionDB()
+    private void attackChecker(int position)
     {
-        Map<String, Object> values = new HashMap<>();
-        values.put(positionChecker.getValue(), IconEnum.BLACK_MAP.getMapCode());
-        firebaseDatabase.updateChild(pathRooms + "/" + roomName + "/" + pathMap, values);
-        values = new HashMap<>();
-        values.put(positionToMove.getValue(), IconEnum.BLACK_CHECKER.getMapCode());
-        firebaseDatabase.updateChild(pathRooms + "/" + roomName + "/" + pathMap, values);
-    }
-
-    protected void check(int position)
-    {
-        firebaseDatabase.getReference(pathRooms + "/" + roomName + "/" + pathMap+ "/" + position).
-                addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        if (Integer.parseInt(Objects.requireNonNull(dataSnapshot.getValue()).toString()) == IconEnum.WHITE_CHECKER.getMapCode())
-                        {
-                            isChecker.setValue(true);
-                        }
-                        else
-                        {
-                            isChecker.setValue(false);
-                        }
-
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });
-    }
-
-    private void attack(int position)
-    {
-        check(position);
-        if (isChecker.getValue())
+        int[] tempMap = map.getValue();
+        if (tempMap[position] == IconEnum.WHITE_CHECKER.getImageCode() ||
+                tempMap[position] == IconEnum.WHITE_QUEEN.getImageCode())
         {
             updatePositionDB();
             Map<String, Object> values = new HashMap<>();
             values.put(String.valueOf(position), IconEnum.BLACK_MAP.getMapCode());
             firebaseDatabase.updateChild(pathRooms + "/" + roomName + "/" + pathMap, values);
-            countChecker.setValue(countChecker.getValue() - 1);
-            Log.d("count  ", String.valueOf(countChecker.getValue()));
+            countChecker.setValue(countChecker.getValue() + 1);
             changePosition();
+            turnedQueen();
             int[] temp = map.getValue();
             temp[position] = IconEnum.BLACK_MAP.getImageCode();
             map.setValue(temp);
@@ -211,60 +183,135 @@ public class VisitorViewModel extends AndroidViewModel implements IMap {
         }
     }
 
+
+    private void turnedQueen()
+    {
+        if (    positionToMove.getValue().equals("56") ||
+                positionToMove.getValue().equals("58") ||
+                positionToMove.getValue().equals("60") ||
+                positionToMove.getValue().equals("62"))
+        {
+            Map<String, Object> values = new HashMap<>();
+            values.put(positionToMove.getValue(), IconEnum.BLACK_QUEEN.getMapCode());
+            firebaseDatabase.updateChild(pathRooms + "/" + roomName + "/" + pathMap, values);
+            int[] temp = map.getValue();
+            temp[Integer.parseInt(positionToMove.getValue())] = IconEnum.BLACK_QUEEN.getImageCode();
+            map.setValue(temp);
+            isStep.setValue(true);
+        }
+    }
+
     public void move()
     {
-        int positionPlus7 = Integer.parseInt(positionChecker.getValue()) + 7;
-        int positionPlus9 = Integer.parseInt(positionChecker.getValue()) + 9;
-        int positionMinus7 = Integer.parseInt(positionChecker.getValue()) - 7;
-        int positionMinus9 = Integer.parseInt(positionChecker.getValue()) - 9;
-        if (positionPlus7 == Integer.parseInt(positionToMove.getValue()) ||
-                positionPlus9  == Integer.parseInt(positionToMove.getValue()))
+        if (!isQueen.getValue())
         {
-            if (!isStep.getValue())
+            int positionPlus7 = Integer.parseInt(positionChecker.getValue()) + 7;
+            int positionPlus9 = Integer.parseInt(positionChecker.getValue()) + 9;
+            int positionMinus7 = Integer.parseInt(positionChecker.getValue()) - 7;
+            int positionMinus9 = Integer.parseInt(positionChecker.getValue()) - 9;
+            if (positionPlus7 == Integer.parseInt(positionToMove.getValue()) ||
+                    positionPlus9  == Integer.parseInt(positionToMove.getValue()))
             {
-                updatePositionDB();
-                changePosition();
-                updateMap();
-                Map<String, Object> values = new HashMap<>();
-                values.put(pathStep, "host");
-                firebaseDatabase.updateChild(pathRooms + "/" + roomName, values);
-                isStep.setValue(false);
+                if (!isStep.getValue())
+                {
+                    updatePositionDB();
+                    changePosition();
+                    turnedQueen();
+                    updateMap();
+                    Map<String, Object> values = new HashMap<>();
+                    values.put(pathStep, "host");
+                    firebaseDatabase.updateChild(pathRooms + "/" + roomName, values);
+                    isStep.setValue(false);
+                }
+            }
+            else if (Integer.parseInt(positionChecker.getValue()) - 18  == Integer.parseInt(positionToMove.getValue()))
+            {
+                attackChecker(positionMinus9);
+                endStep();
+                isStep.setValue(true);
+            }
+            else if(Integer.parseInt(positionChecker.getValue()) - 14 == Integer.parseInt(positionToMove.getValue()))
+            {
+                attackChecker(positionMinus7);
+                endStep();
+                isStep.setValue(true);
+            }
+            else if (Integer.parseInt(positionChecker.getValue()) + 18  == Integer.parseInt(positionToMove.getValue()))
+            {
+                attackChecker(positionPlus9);
+                endStep();
+                isStep.setValue(true);
+            }
+            else if(Integer.parseInt(positionChecker.getValue()) + 14 == Integer.parseInt(positionToMove.getValue()))
+            {
+                attackChecker(positionPlus7);
+                endStep();
+                isStep.setValue(true);
             }
         }
-        else if (Integer.parseInt(positionChecker.getValue()) - 18  == Integer.parseInt(positionToMove.getValue()))
+        else
         {
-            attack(positionMinus9);
-        }
-        else if(Integer.parseInt(positionChecker.getValue()) - 14 == Integer.parseInt(positionToMove.getValue()))
-        {
-            attack(positionMinus7);
-        }
-        else if (Integer.parseInt(positionChecker.getValue()) + 18  == Integer.parseInt(positionToMove.getValue()))
-        {
-            attack(positionPlus9);
-        }
-        else if(Integer.parseInt(positionChecker.getValue()) + 14 == Integer.parseInt(positionToMove.getValue()))
-        {
-            attack(positionPlus7);
+            int indexChecker = Integer.parseInt(positionChecker.getValue());
+            int indexMove = Integer.parseInt(positionToMove.getValue());
+            boolean up7 = (indexChecker - indexMove) % 7 == 0;
+            boolean up9 = (indexChecker - indexMove) % 9 == 0;
+            int positionToDelete = 0;
+            int countToDelete = 0;
+            if (up7 || up9)
+            {
+                int syllable;
+                if (up7)
+                {
+                    syllable = 7;
+                }
+                else
+                {
+                    syllable = 9;
+                }
+                if (indexChecker < indexMove)
+                {
+                    syllable *= (-1);
+                }
+                while (indexChecker != indexMove)
+                {
+                    indexMove += syllable;
+                    int[] temp = map.getValue();
+                    if (temp[indexMove] == IconEnum.WHITE_CHECKER.getImageCode() ||
+                            temp[indexMove] == IconEnum.WHITE_QUEEN.getImageCode())
+                    {
+                        countToDelete += 1;
+                        positionToDelete = indexMove;
+                    }
+                }
+                if (countToDelete == 0 && !isStep.getValue())
+                {
+                    updatePositionDB();
+                    changePosition();
+                    updateMap();
+                    Map<String, Object> values = new HashMap<>();
+                    values.put(pathStep, "host");
+                    firebaseDatabase.updateChild(pathRooms + "/" + roomName, values);
+                    endStep();
+                }
+                else if (countToDelete == 1)
+                {
+                    updatePositionDB();
+                    changePosition();
+                    Map<String, Object> values = new HashMap<>();
+                    values.put(String.valueOf(positionToDelete), IconEnum.BLACK_MAP.getMapCode());
+                    firebaseDatabase.updateChild(pathRooms + "/" + roomName + "/" + pathMap, values);
+                    countChecker.setValue(countChecker.getValue() + 1);
+                    int[] temp = map.getValue();
+                    temp[positionToDelete] = IconEnum.BLACK_MAP.getImageCode();
+                    map.setValue(temp);
+                    updateMap();
+                    endStep();
+                    isStep.setValue(true);
+                }
+            }
         }
     }
 
-    private void changePosition()
-    {
-        int[] temp = map.getValue();
-        temp[Integer.parseInt(positionChecker.getValue())] = IconEnum.BLACK_MAP.getImageCode();
-        temp[Integer.parseInt(positionToMove.getValue())] = IconEnum.BLACK_CHECKER.getImageCode();
-        map.setValue(temp);
-    }
-
-
-    public LiveData<String> getPositionChecker() {
-        return positionChecker;
-    }
-
-    public LiveData<String> getPositionToMove() {
-        return positionToMove;
-    }
 
     public void updateMap()
     {
@@ -288,11 +335,44 @@ public class VisitorViewModel extends AndroidViewModel implements IMap {
 
     }
 
+    private void updatePositionDB()
+    {
+        Map<String, Object> values = new HashMap<>();
+        values.put(positionChecker.getValue(), IconEnum.BLACK_MAP.getMapCode());
+        firebaseDatabase.updateChild(pathRooms + "/" + roomName + "/" + pathMap, values);
+        values = new HashMap<>();
+        int[] temp = map.getValue();
+        if(temp[Integer.parseInt(positionChecker.getValue())] == IconEnum.BLACK_CHECKER.getImageCode())
+        {
+            values.put(positionToMove.getValue(), IconEnum.BLACK_CHECKER.getMapCode());
+        }
+        else
+        {
+            values.put(positionToMove.getValue(), IconEnum.BLACK_QUEEN.getMapCode());
+        }
+        firebaseDatabase.updateChild(pathRooms + "/" + roomName + "/" + pathMap, values);
+    }
+
+    private void changePosition()
+    {
+        int[] temp = map.getValue();
+        if(temp[Integer.parseInt(positionChecker.getValue())] == IconEnum.BLACK_CHECKER.getImageCode())
+        {
+            temp[Integer.parseInt(positionToMove.getValue())] = IconEnum.BLACK_CHECKER.getImageCode();
+        }
+        else
+        {
+            temp[Integer.parseInt(positionToMove.getValue())] = IconEnum.BLACK_QUEEN.getImageCode();
+        }
+        temp[Integer.parseInt(positionChecker.getValue())] = IconEnum.BLACK_MAP.getImageCode();
+        map.setValue(temp);
+    }
+
     public LiveData<String> getStepET() {
         return stepET;
     }
 
-    public void endStep()
+    public void endStepInBtn()
     {
         if (isStep.getValue())
         {
@@ -303,4 +383,13 @@ public class VisitorViewModel extends AndroidViewModel implements IMap {
         }
     }
 
+    private void endStep()
+    {
+        isChecker.setValue(false);
+        isStep.setValue(false);
+        isQueen.setValue(false);
+        isCheckerSelected.setValue(false);
+        positionChecker.setValue("-1");
+        positionToMove.setValue("-1");
+    }
 }
